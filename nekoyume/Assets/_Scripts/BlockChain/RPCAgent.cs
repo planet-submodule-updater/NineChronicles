@@ -9,7 +9,6 @@ using Bencodex;
 using Bencodex.Types;
 using Cysharp.Threading.Tasks;
 using Grpc.Core;
-using Ionic.Zlib;
 using Lib9c.Renderer;
 using Libplanet;
 using Libplanet.Action;
