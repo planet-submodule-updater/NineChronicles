@@ -39,7 +39,7 @@ jobs:
         with:
           path: ${{ matrix.projectPath }}/Library
           key: ${{ matrix.targetPlatform }}-${{ matrix.projectPath }}-Library-v4
-      
+
       - name: inject mixpanel client data
         run: |
           chmod +x .github/bin/inject-mixpanel-client-data.sh
@@ -71,7 +71,6 @@ jobs:
           - Windows
           - macOS
     needs: build-unity
-    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/development' || startsWith(github.ref, 'refs/heads/rc-') }}
     steps:
       - uses: actions/checkout@v2
 
@@ -100,11 +99,11 @@ jobs:
           dotnet tool install \
             --global \
             Libplanet.Tools
-          
+
           # macOS 내장 date는 ISO 8601 서식 옵션이 따로 없음
           timestamp="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
           pip3 install wheel
-          
+
           .github/bin/pack.sh \
           /tmp/package \
           "${{ matrix.targetPlatform }}" \
