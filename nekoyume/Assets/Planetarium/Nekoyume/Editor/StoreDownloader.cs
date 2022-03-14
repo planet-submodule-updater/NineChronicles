@@ -11,51 +11,80 @@ namespace Planetarium.Nekoyume.Editor
 {
     public static class StoreDownloader
     {
-        [MenuItem("Tools/Store/Download and Extract Main-net Store", true)]
-        public static bool Validation() => !Application.isPlaying;
+        private const string MainNetPartitionFullSnapshotURL =
+            "https://9c-snapshots.s3.ap-northeast-2.amazonaws.com/main/partition/full/9c-main-snapshot.zip";
 
-        [MenuItem("Tools/Store/Download and Extract Main-net Store")]
+        [MenuItem("Tools/Store/Download Main-net Snapshot", true)]
+        public static bool DownloadMainNetStoreValidation() => !Application.isPlaying;
+
+        [MenuItem("Tools/Store/Download Main-net Snapshot")]
+        public static void DownloadMainNetStore()
+        {
+            if (!EditorUtility.DisplayDialog("Question", "This job takes a very long time. Do you want to continue?",
+                "Yes", "No"))
+            {
+                Debug.Log("Downloading main-net snapshot canceled");
+                return;
+            }
+
+            var fileName = $"main-net-snapshot-{DateTime.Now:yyyy-MM-dd-HH-mm-ss}";
+            var downloadFilePath = EditorUtility.SaveFilePanel(
+                "Select Download Path",
+                Application.temporaryCachePath,
+                fileName,
+                "zip");
+            if (string.IsNullOrEmpty(downloadFilePath))
+            {
+                Debug.Log("Downloading main-net snapshot canceled");
+                return;
+            }
+
+            EditorCoroutineUtility.StartCoroutineOwnerless(DownloadFileAsync(
+                downloadFilePath,
+                MainNetPartitionFullSnapshotURL));
+        }
+
+        [MenuItem("Tools/Store/Download and Extract Main-net Snapshot", true)]
+        public static bool DownloadAndExtractMainNetStoreValidation() => !Application.isPlaying;
+
+        [MenuItem("Tools/Store/Download and Extract Main-net Snapshot")]
         public static void DownloadAndExtractMainNetStore()
         {
             if (!EditorUtility.DisplayDialog("Question", "This job takes a very long time. Do you want to continue?",
                 "Yes", "No"))
             {
-                Debug.Log("Downloading store canceled");
+                Debug.Log("Downloading main-net snapshot canceled");
                 return;
             }
 
             var selectedFolder = EditorUtility.SaveFolderPanel(
-                "Select Folder",
+                "Select Extract Path",
                 StorePath.GetPrefixPath(),
                 "9c_dev");
             if (string.IsNullOrEmpty(selectedFolder))
             {
-                Debug.Log("Downloading store canceled");
+                Debug.Log("Downloading main-net snapshot canceled");
                 return;
             }
 
-            EditorCoroutineUtility.StartCoroutineOwnerless(DownloadAndExtractMainNetStoreAsync(selectedFolder));
+            EditorCoroutineUtility.StartCoroutineOwnerless(
+                DownloadZipFileAndExtractAsync(
+                    MainNetPartitionFullSnapshotURL,
+                    selectedFolder));
         }
 
-        private static IEnumerator DownloadAndExtractMainNetStoreAsync(string extractPath)
+        private static IEnumerator DownloadFileAsync(string downloadFilePath, string url)
         {
-            const string url =
-                "https://9c-snapshots.s3.ap-northeast-2.amazonaws.com/main/partition/full/9c-main-snapshot.zip";
-            // const string url = "https://drive.google.com/uc?export=download&id=10kGM9sPSTjw0tdej2ITKzovWQxgbZubM";
-            using var request = UnityWebRequest.Get(url);
-            var fileName = $"{DateTime.Now:yyyy-MM-dd-hh-mm-ss}.zip";
-            var downloadFilePath = Path.Combine(
-                Application.temporaryCachePath,
-                fileName);
             using var downloadHandler = new DownloadHandlerFile(downloadFilePath);
             downloadHandler.removeFileOnAbort = true;
+            using var request = UnityWebRequest.Get(url);
             request.downloadHandler = downloadHandler;
             var asyncOperation = request.SendWebRequest();
             while (!asyncOperation.isDone)
             {
                 if (EditorUtility.DisplayCancelableProgressBar(
                     "Download",
-                    $"url: {url}\ndownload to: {downloadFilePath}",
+                    $"url: {MainNetPartitionFullSnapshotURL}\ndownload to: {downloadFilePath}",
                     asyncOperation.progress))
                 {
                     request.Abort();
@@ -72,7 +101,8 @@ namespace Planetarium.Nekoyume.Editor
 
             if (request.result != UnityWebRequest.Result.Success)
             {
-                EditorUtility.DisplayDialog("Error", $"Failed to download the Main-net Store at \"{url}\"", "ok");
+                EditorUtility.DisplayDialog("Error",
+                    $"Failed to download the Main-net Store at \"{MainNetPartitionFullSnapshotURL}\"", "ok");
                 yield break;
             }
 
@@ -82,13 +112,24 @@ namespace Planetarium.Nekoyume.Editor
                 yield break;
             }
 
+            Debug.Log($"Download the Main-net store finished. Downloaded at \"{downloadFilePath}\"");
+        }
+
+        private static IEnumerator DownloadZipFileAndExtractAsync(string url, string extractPath)
+        {
+            var fileName = $"main-net-snapshot-{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.zip";
+            var downloadFilePath = Path.Combine(Application.temporaryCachePath, fileName);
+            yield return EditorCoroutineUtility.StartCoroutineOwnerless(DownloadFileAsync(
+                downloadFilePath,
+                url));
+
             ZipUnzip.Unzip(downloadFilePath, extractPath);
             if (EditorUtility.DisplayDialog("Delete zip file", "Do you want to delete the zip file?", "Yes", "No"))
             {
                 File.Delete(downloadFilePath);
             }
-            
-            Debug.Log($"Download and extract the Main-net store finished. Extracted at \"{extractPath}\"");
+
+            Debug.Log($"Download and extract the Main-net snapshot finished. Extracted at \"{extractPath}\"");
         }
     }
 }
