@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.brunomikoski.animationsequencer": "0.1.6",
+    "com.brunomikoski.animationsequencer": "0.3.3",
     "com.coffee.softmask-for-ugui": "https://github.com/mob-sakai/SoftMaskForUGUI.git#upm",
     "com.coffee.ui-effect": "https://github.com/mob-sakai/UIEffect.git#upm",
     "com.coffee.ui-particle": "https://github.com/mob-sakai/ParticleEffectForUGUI.git#main",
