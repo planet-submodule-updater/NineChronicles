@@ -56,7 +56,8 @@
     "com.unity.modules.video": "1.0.0",
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
-    "com.unity.modules.xr": "1.0.0"
+    "com.unity.modules.xr": "1.0.0",
+    "org.kumas.nuget-importer": "2.1.2"
   },
   "scopedRegistries": [
     {
@@ -67,7 +68,8 @@
         "com.demigiant.dotween",
         "com.laicasaane.texttyper",
         "com.openupm",
-        "com.unity.uiextensions"
+        "com.unity.uiextensions",
+        "org.kumas.nuget-importer"
       ]
     }
   ]

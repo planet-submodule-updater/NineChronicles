@@ -33,6 +33,7 @@ MonoBehaviour:
     - com.laicasaane.texttyper
     - com.openupm
     - com.unity.uiextensions
+    - org.kumas.nuget-importer
     m_IsDefault: 0
     m_Capabilities: 0
   m_UserSelectedRegistryName: 
@@ -49,6 +50,7 @@ MonoBehaviour:
       - com.laicasaane.texttyper
       - com.openupm
       - com.unity.uiextensions
+      - org.kumas.nuget-importer
       m_IsDefault: 0
       m_Capabilities: 0
     m_Modified: 0
@@ -60,4 +62,5 @@ MonoBehaviour:
     - com.laicasaane.texttyper
     - com.openupm
     - com.unity.uiextensions
+    - org.kumas.nuget-importer
     m_SelectedScopeIndex: 0
